@@ -1,90 +1,124 @@
-<polymer-element name="ceci-button" attributes="textcolor buttoncolor buttonactivecolor label value" extends="ceci-element"
-  label="Click Me" textcolor="#ffffff" buttoncolor="#4DB227" buttonactivecolor="#358915">
-  <template>
-    <link rel="stylesheet" href="component.css"></link>
-    <button id="button" on-click="{{click}}"></button>
-    <shadow></shadow>
-    <script type="text/json" id="ceci-definition">
+<!--TODO-->
+<!--1. stop event-->
+<!--2. Does this evaluate true / false  this.getAttribute('autostart')-->
+<!--3. support tap / touch event? touchend-->
+<!--4. cancel-->
+
+<polymer-element name="ceci-metronome" attributes="beatsperminute autostart" beatsperminute=60 autostart="true" extends="ceci-element"
+                 label="Click Me" textcolor="#ffffff" buttoncolor="#4DB227" buttonactivecolor="#358915">
+    <template>
+        <link rel="stylesheet" href="component.css"/>
+        <div class="metronome-wrapper" on-click="{{click}}">
+            <div class="metronome-shadow"></div>
+            <div class="metronome-body">
+                <div class="metronome-hole"></div>
+                <div class="metronome-arrow"></div>
+            </div>
+        </div>
+        <shadow></shadow>
+        <script type="text/json" id="ceci-definition">
       {
-        "tags": ["button", "click", "tap"],
+        "description": "Outputs ticks measured in Beats Per Minute (BPM)",
+        "tags": ["fun","animated","starter"],
         "thumbnail": "./thumbnail.png",
         "broadcasts": {
-          "click": {
-            "label": "Click",
-            "description": "Occurs when button is clicked.",
+          "tick": {
+            "label": "Tick",
+            "description": "A tick of the metronome measured in Beats Per Minute(BPM)",
             "default": true
           }
         },
         "listeners": {
-          "click": {
-            "description": "Causes a fake click event to occur.",
-            "label": "Click"
-          }
+            "stop": {
+                "description": "Stops metronome playback.",
+                "label": "Stop playback"
+            },
+            "start": {
+                "description": "Starts metronome playback.",
+                "label": "Stop playback"
+            }
         },
         "attributes": {
-          "label": {
-            "label": "Label",
-            "description": "Text shown on the button.",
-            "editable": "text",
+          "beatsperminute": {
+            "label": "Beats Per Minute (BPM)",
+            "description": "Metronome ticks measured in beats per minute",
+            "editable": "number",
+            "min" : 0.1,
             "listener": true
+
           },
-          "value": {
-            "label": "Value",
-            "description": "Value sent by the button.",
-            "editable": "text",
-            "listener": true,
-            "defaultListener": true
-          },
-          "textcolor": {
-            "label": "Text Color",
-            "description": "Color of the text on the button's label.",
-            "editable": "color",
-            "listener": true
-          },
-          "buttoncolor": {
-            "label": "Button Color",
-            "description": "Background color of the button.",
-            "editable": "color",
-            "listener": true
-          },
-          "buttonactivecolor": {
-            "label": "Button Active Color",
-            "description": "Background color of the button while it is being clicked or tapped.",
-            "editable": "color",
+          "autostart": {
+            "label": "Autostart",
+            "description": "Boolean value that controls if the metronome starts auto-playing when the component loads",
+            "editable": "boolean",
             "listener": true
           }
         }
       }
-    </script>
-  </template>
-  <script>
-    Polymer('ceci-button', {
-      ready: function () {
-        this.super();
 
-        var that = this;
-        this.$.button.addEventListener('mousedown', function (e) {
-          var valueBefore = that.buttoncolor;
-          if (that.buttonactivecolor) {
-            that.$.button.style.backgroundColor = that.buttonactivecolor;
-            window.addEventListener('mouseup', function (e) {
-              that.$.button.style.backgroundColor = valueBefore;
-            }, false);
-          }
-        }, false);
-      },
-      click: function () {
-        this.broadcast('click', this.getAttribute('value'));
-      },
-      labelChanged: function (oldValue, newValue) {
-        this.$.button.innerHTML = newValue;
-      },
-      textcolorChanged: function (oldValue, newValue) {
-        this.$.button.style.color = newValue;
-      },
-      buttoncolorChanged: function (oldValue, newValue) {
-        this.$.button.style.backgroundColor = newValue;
-      }
-    });
-  </script>
+
+        </script>
+    </template>
+    <script>
+        Polymer('ceci-metronome', {
+            ready: function () {
+                this.super();
+                var that = this;
+
+                this._count = 0;
+                this._playing = false;
+
+                if (this.autostart) {
+                    this.start();
+                }
+
+                this.timeout = null;
+            },
+            leftView: function () {
+                clearTimeout(this.timeout);
+            },
+            setArrowSpeed: function (v) {
+                var animDuration = v * 2;
+
+                var metronomeArrow = this.shadowRoot.querySelector('.metronome-arrow');
+                console.log(metronomeArrow)
+                metronomeArrow.classList.remove("metronome-animation");
+                if (v > 0 && this._playing) {
+                    console.log("duration: " + animDuration)
+                    metronomeArrow.offsetWidth = metronomeArrow.offsetWidth;
+                    metronomeArrow.classList.add("metronome-animation");
+                    metronomeArrow.style.webkitAnimationDuration = animDuration + "s";
+                    metronomeArrow.style.animationDuration = animDuration + "s";
+                }
+            },
+            beatsperminuteChanged: function (oldValue, newValue) {
+                if (newValue <= 0) {
+                    this.beatsperminute = 0.1;
+                }
+            },
+            start: function (oldValue, newValue) {
+                this._playing = true;
+                this.setArrowSpeed((60 / this.beatsperminute));
+                this.tick();
+            },
+            stop: function () {
+                this._playing = false;
+                this.setArrowSpeed(0);
+            },
+            tick: function () {
+                if (!this._playing) {
+                    // This stops the setting of the next setTimeout
+                    return;
+                }
+                this._count++;
+                this.broadcast('tick', this._count);
+
+                var t = this;
+                var defer = function () {
+                    t.tick();
+                };
+                this.timeout = setTimeout(defer, (60 / this.beatsperminute) * 1000);
+            }
+        });
+    </script>
 </polymer-element>
