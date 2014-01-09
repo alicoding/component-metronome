@@ -1,18 +1,18 @@
-component-button
+component-metronome
 ================
 
-[![Build Status](https://travis-ci.org/mozilla-appmaker/component-button.png)](https://travis-ci.org/mozilla-appmaker/component-button)
+[![Build Status](https://travis-ci.org/mozilla-appmaker/component-metronome.png)](https://travis-ci.org/mozilla-appmaker/component-metronome)
 
-Basic button component for [Appmaker](https://github.com/mozilla-appmaker/appmaker).
+Basic metronome component for [Appmaker](https://github.com/mozilla-appmaker/appmaker).
 
 Appmaker import:
 ```
-<link rel="import" href="/component-button">
+<link rel="import" href="/component-metronome">
 ```
 
 # Test Status
 
-See the github page http://mozilla-appmaker.github.io/component-button/ for test status.
+See the github page http://mozilla-appmaker.github.io/component-metronome/ for test status.
 
 # Installation
 `component.html` can be served from this repo without any setup. However, `Polymer` and `ceci-element` must be exposed for the component to function. The instructions below detail a full development/testing environment.
@@ -27,7 +27,7 @@ cd mozilla-appmaker
 
 Clone this repo:
 ```
-git clone git@github.com:mozilla-appmaker/component-button.git
+git clone git@github.com:mozilla-appmaker/component-metronome.git
 ```
 
 Clone the `tools` repo:
@@ -40,17 +40,17 @@ Clone the `appmaker` repo, which will provide foundational appmaker components:
 git clone git@github.com:mozilla-appmaker/appmaker.git
 ```
 
-Your directory structure should look like this (more component repos can be cloned as siblings of `component-button`):
+Your directory structure should look like this (more component repos can be cloned as siblings of `component-metronome`):
 ```
 mozilla-appmaker/
   ├── appmaker/
-  ├── component-button/
+  ├── component-metronome/
   └── tools/
 ```
 
-Enter the `component-button` directory, and install npm dependencies
+Enter the `component-metronome` directory, and install npm dependencies
 ```
-cd component-button
+cd component-metronome
 npm install
 ```
 
@@ -64,7 +64,7 @@ Include this component in your appmaker app using Polymer's `<link>` import tag:
 
 In appmaker, this component is available using gh-pages:
 ```
-<link rel="import" href="/component-button">
+<link rel="import" href="/component-metronome">
 ```
 
 # Testing
@@ -201,12 +201,12 @@ This is the root testing file. It contains tests to run, and mechanisms to spawn
   
   beforeEach(function (done) {
     iframeHandler = harnessUtils.createIframe('test/html/test.html', function (win, doc) {
-      buttonElement = iframeHandler.document.querySelector('ceci-button');
+      buttonElement = iframeHandler.document.querySelector('ceci-metronome');
       done();
     });
   });
 
-  describe('Ceci Button', function () {
+  describe('Ceci metronome', function () {
     test('Sanity check', function (done) {
       chai.assert(buttonElement.ceci, 'Ceci descriptor exists.');
       iframeHandler.runIframeTest('Sanity Check', done);
@@ -242,7 +242,7 @@ You can then include and instance of this repo's element in the document body:
 ```
 <body>
   <!-- The skeleton app we'll be using to test -->
-  <ceci-button id="ceci-button" value="you must construct additional pylons"></ceci-button>
+  <ceci-metronome id="ceci-metronome" value="you must construct additional pylons"></ceci-metronome>
 </body>
 </html>
 ```
@@ -257,8 +257,8 @@ Then, make sure `iframeTestUtils` is called, which will queue named tests to be 
 <script>
   iframeTestUtils(function () {
     test('example', function (done) {
-      var buttonElement = document.querySelector('ceci-button');
-      chai.assert(buttonElement.$.button, 'Button recognized and exposed by Polymer.');
+      var buttonElement = document.querySelector('ceci-metronome');
+      chai.assert(buttonElement.$.button, 'metronome recognized and exposed by Polymer.');
       chai.assert(buttonElement.ceci.broadcasts, 'Ceci broadcasts publicized.');
       chai.assert(buttonElement.ceci.listeners, 'Ceci listeners publicized.');
       done();
